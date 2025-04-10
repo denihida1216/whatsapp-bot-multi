@@ -1,0 +1,44 @@
+# Node modules
+node_modules/
+
+# Node modules
+sessions/
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# dotenv environment
+.env
+
+# Compiled output
+dist/
+build/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# PM2 logs
+pids/
+*.log
+.pm2/logs/
+
+# VSCode folder
+.vscode/
+
+# Coverage
+coverage/
+
+# Optional: custom temp or debug folders
+tmp/
+temp/

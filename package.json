@@ -1,0 +1,29 @@
+{
+  "dependencies": {
+    "axios": "^1.8.4",
+    "child_process": "^1.0.2",
+    "dotenv": "^16.4.7",
+    "express": "^5.1.0",
+    "express-fileupload": "^1.5.1",
+    "express-validator": "^7.2.1",
+    "http": "0.0.1-security",
+    "mime-types": "^3.0.1",
+    "openai": "^4.93.0",
+    "pdf-lib": "^1.17.1",
+    "pm2": "^6.0.5",
+    "qrcode": "^1.5.4",
+    "qrcode-terminal": "^0.12.0",
+    "socket.io": "^4.8.1",
+    "source-map-resolve": "^0.6.0",
+    "source-map-url": "^0.4.1",
+    "urix": "^0.1.0",
+    "puppeteer": "^24.6.0",
+    "whatsapp-web.js": "^1.27.0"
+  },
+  "name": "whatsapp-bot-multi",
+  "version": "1.0.0",
+  "main": "index.js",
+  "author": "Whatsapp Api",
+  "license": "MIT",
+  "description": "Whatsapp Api, Whatsapp BOT"
+}

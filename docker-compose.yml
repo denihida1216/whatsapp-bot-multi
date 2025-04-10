@@ -1,0 +1,14 @@
+services:
+  wabot_multi:
+    build: .
+    container_name: wabot_multi
+    environment:
+      - NODE_ENV=production
+    restart: always
+    working_dir: /app
+    volumes:
+      - /app/node_modules
+      - /opt/whatsapp-bot-multi:/app
+      - /opt/whatsapp-bot-multi/sessions:/app/sessions
+    ports:
+      - "212:3000"

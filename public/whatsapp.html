@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, shrink-to-fit=no"
+    />
+    <meta name="robots" content="noindex" />
+    <meta name="googlebot" content="noindex" />
+    <meta name="description" content="" />
+    <meta name="author" content="WABOT RSUD ALIHSAN" />
+    <meta name="generator" content="Whatsapp Scan QR" />
+    <title>Whatsapp Scan QR</title>
+    <link href="/bootstrap.min.css" rel="stylesheet" />
+  </head>
+
+  <body>
+    <div class="container py-4">
+      <h3 class="mb-4 text-center">Whatsapp Multi Account</h3>
+      <div class="row" id="clients-container"></div>
+    </div>
+    <script src="/jquery.min.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+      $(document).ready(function () {
+        const socket = io();
+
+        function logMessage(clientId, message) {
+          const $log = $(`.logs-${clientId}`);
+          $log.append($("<li>").text(message));
+          if ($log.children().length > 10) {
+            $log.children().first().remove();
+          }
+        }
+
+        function createClientCard(clientId, qr) {
+          if ($(`#client-${clientId}`).length > 0) return;
+
+          $("#clients-container").append(`
+          <div class="col-md-4 mb-4" id="client-${clientId}">
+            <div class="card h-100">
+              <div class="card-body">
+                <h5 class="card-title">Client: ${clientId}</h5>
+                <img id="qrcode-${clientId}" src="${qr}" class="img-fluid mb-3" />
+                <div class="status-${clientId} badge bg-warning text-dark mb-2">Menunggu scan...</div>
+                <div class="mb-2">
+                  <button class="btn btn-sm btn-block btn-outline-warning restart-btn" data-id="${clientId}">🔄 Restart</button>
+                  <button class="btn btn-sm btn-block btn-outline-danger logout-btn" data-id="${clientId}" style="display: none;">🚪 Logout</button>
+                </div>
+                <ul class="logs logs-${clientId}" style="font-size: 0.8rem;"></ul>
+              </div>
+            </div>
+          </div>
+        `);
+
+          $(`#client-${clientId}`)[0].scrollIntoView({ behavior: "smooth" });
+        }
+
+        $(document).on("click", ".restart-btn", function () {
+          const clientId = $(this).data("id");
+          if (confirm(`Yakin restart client ${clientId}?`)) {
+            $.post(`/restart/${clientId}`, function (res) {
+              alert(res.message);
+              $(`.logs-${clientId}`).empty();
+            });
+          }
+        });
+
+        $(document).on("click", ".logout-btn", function () {
+          const clientId = $(this).data("id");
+          if (confirm(`Yakin logout client ${clientId}?`)) {
+            $.post(`/logout/${clientId}`, function (res) {
+              alert(res.message);
+              $(`.logs-${clientId}`).empty();
+            });
+          }
+        });
+
+        socket.on("clients", function (clients) {
+          clients.forEach(({ clientId }) => {
+            if (!$(`#client-${clientId}`).length) {
+              createClientCard(clientId, "");
+            }
+          });
+        });
+
+        socket.on("qr", function ({ clientId, qr }) {
+          if (!$(`#client-${clientId}`).length) {
+            createClientCard(clientId, qr);
+            $(`#qrcode-${clientId}`).show();
+          } else {
+            $(`#qrcode-${clientId}`).attr("src", qr).show();
+          }
+
+          $(`.status-${clientId}`)
+            .removeClass()
+            .addClass(`status-${clientId} badge bg-warning text-dark`)
+            .text("Menunggu scan...");
+          $(`#client-${clientId} .logout-btn`).hide();
+          logMessage(clientId, "📱 QR diterima");
+        });
+
+        socket.on("ready", function ({ clientId }) {
+          if (!$(`#client-${clientId}`).length) {
+            createClientCard(clientId, "");
+          }
+          $(`#qrcode-${clientId}`).hide();
+          $(`.status-${clientId}`)
+            .removeClass()
+            .addClass(`status-${clientId} badge bg-success`)
+            .text("✅ Ready");
+          $(`#client-${clientId} .logout-btn`).show();
+          logMessage(clientId, "✅ Siap digunakan");
+        });
+
+        socket.on("authenticated", function ({ clientId }) {
+          if (!$(`#client-${clientId}`).length) {
+            createClientCard(clientId, "");
+          }
+          $(`#qrcode-${clientId}`).hide();
+          $(`.status-${clientId}`)
+            .removeClass()
+            .addClass(`status-${clientId} badge bg-primary`)
+            .text("🔐 Authenticated");
+          $(`#client-${clientId} .logout-btn`).show();
+          logMessage(clientId, "🔐 Terautentikasi");
+        });
+
+        socket.on("disconnected", function ({ clientId }) {
+          $(`#qrcode-${clientId}`).hide();
+          $(`.status-${clientId}`)
+            .removeClass()
+            .addClass(`status-${clientId} badge bg-danger`)
+            .text("❌ Disconnected");
+          $(`#client-${clientId} .logout-btn`).hide();
+          logMessage(clientId, "❌ Terputus");
+        });
+      });
+    </script>
+  </body>
+</html>
